@@ -4,11 +4,12 @@ import (
 	"flag"
 	"fmt"
 	"math/rand"
+	"time"
 
 	"github.com/pion/webrtc/v2"
 
-	gst "github.com/pion/example-webrtc-applications/internal/gstreamer-src"
-	"github.com/pion/example-webrtc-applications/internal/signal"
+	gst "github.com/lherman-cs/example-webrtc-applications/internal/gstreamer-src"
+	"github.com/lherman-cs/example-webrtc-applications/internal/signal"
 )
 
 func main() {
@@ -27,8 +28,16 @@ func main() {
 		},
 	}
 
+	var s webrtc.SettingEngine
+	s.SetCandidateSelectionTimeout(time.Minute)
+
+	var m webrtc.MediaEngine
+	m.RegisterDefaultCodecs()
+
+	a := webrtc.NewAPI(webrtc.WithSettingEngine(s), webrtc.WithMediaEngine(m))
+
 	// Create a new RTCPeerConnection
-	peerConnection, err := webrtc.NewPeerConnection(config)
+	peerConnection, err := a.NewPeerConnection(config)
 	if err != nil {
 		panic(err)
 	}
